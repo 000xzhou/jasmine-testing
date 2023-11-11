@@ -1,36 +1,26 @@
-describe("payment testing center", function () {
+describe("Payments test (with setup and tear-down)", function () {
   beforeEach(function () {
-    // initialization logic
-    billAmtInput.value = 150;
-    tipAmtInput.value = 10;
+    billAmtInput.value = 100;
+    tipAmtInput.value = 20;
   });
-  it("should add object to allPayments", function () {
+
+  it("should add a new payment to allPayments on submitPaymentInfo()", function () {
     submitPaymentInfo();
+
     expect(Object.keys(allPayments).length).toEqual(1);
-    expect(allPayments["payment1"].billAmt).toEqual("150");
-    expect(allPayments["payment1"].tipPercent).toEqual(7);
-    expect(allPayments["payment1"].tipAmt).toEqual("10");
+    expect(allPayments["payment1"].billAmt).toEqual("100");
+    expect(allPayments["payment1"].tipAmt).toEqual("20");
+    expect(allPayments["payment1"].tipPercent).toEqual(20);
   });
-  it("should return undefined with negative or empty inputs", function () {
+
+  it("should not add a new payment on submitPaymentInfo() with empty input", function () {
     billAmtInput.value = "";
-    tipAmtInput.value = "";
-    let noPayment = createCurPayment();
-    expect(noPayment).toEqual(undefined);
+    submitPaymentInfo();
+
+    expect(Object.keys(allPayments).length).toEqual(0);
   });
-  // it("should not add in all payment on sumbit payment if enter empty bill", function () {
-  //   billAmtInput.value = "";
-  //   submitPaymentInfo();
-  //   expect(Object.keys(allPayments).length).toEqual(0);
-  // });
-  it("should return an object with bill, tip and %", function () {
-    let expectedPayment = {
-      billAmt: "150",
-      tipAmt: "10",
-      tipPercent: 7,
-    };
-    expect(createCurPayment()).toEqual(expectedPayment);
-  });
-  It("should Create table row element and pass to appendTd", () => {
+
+  it("should payment update #paymentTable on appendPaymentTable()", function () {
     let curPayment = createCurPayment();
     allPayments["payment1"] = curPayment;
 
@@ -39,15 +29,31 @@ describe("payment testing center", function () {
     let curTdList = document.querySelectorAll("#paymentTable tbody tr td");
 
     expect(curTdList.length).toEqual(4);
-    expect(curTdList[0].innerText).toEqual("$150");
-    expect(curTdList[1].innerText).toEqual("$10");
-    expect(curTdList[2].innerText).toEqual("%7");
+    expect(curTdList[0].innerText).toEqual("$100");
+    expect(curTdList[1].innerText).toEqual("$20");
+    expect(curTdList[2].innerText).toEqual("%20");
     expect(curTdList[3].innerText).toEqual("X");
   });
+
+  it("should create a new payment on createCurPayment()", function () {
+    let expectedPayment = {
+      billAmt: "100",
+      tipAmt: "20",
+      tipPercent: 20,
+    };
+
+    expect(createCurPayment()).toEqual(expectedPayment);
+  });
+
+  it("should not create payment with empty input on createCurPayment()", function () {
+    billAmtInput.value = "";
+    tipAmtInput.value = "";
+    let curPayment = createCurPayment();
+
+    expect(curPayment).toEqual(undefined);
+  });
+
   afterEach(function () {
-    // teardown logic
-    let allPayments = {};
-    let paymentId = 0;
     billAmtInput.value = "";
     tipAmtInput.value = "";
     paymentTbody.innerHTML = "";
@@ -55,5 +61,7 @@ describe("payment testing center", function () {
     summaryTds[1].innerHTML = "";
     summaryTds[2].innerHTML = "";
     serverTbody.innerHTML = "";
+    paymentId = 0;
+    allPayments = {};
   });
 });
